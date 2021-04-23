@@ -1,4 +1,7 @@
+const crypto = require("crypto");
+
 const mongoose = require("mongoose");
+
 const Schema = mongoose.Schema;
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -43,6 +46,13 @@ const userSchema = new Schema({
   passwordChangedAt: {
     type: Date,
   },
+  passwordResetToken: String,
+  passwordTokenExpire: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -54,6 +64,19 @@ userSchema.pre("save", async function (next) {
 
   //Undefine the confirmed password because it was changed
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangeAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+
   next();
 });
 
@@ -73,7 +96,7 @@ Instance method - check if the user changed its password
 */
 
 userSchema.methods.passwordChanged = function (JWTtimestamp) {
-  if (this.passwordChanged) {
+  if (this.passwordChangedAt) {
     const changedTimeStamp = parseInt(
       this.passwordChangedAt.getTime() / 1000,
       10
@@ -85,6 +108,21 @@ userSchema.methods.passwordChanged = function (JWTtimestamp) {
 
   //False means not changed, which means that the JWTTimestamp is less than the changedTimeStamp
   return false;
+};
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  this.passwordTokenExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("User", userSchema);

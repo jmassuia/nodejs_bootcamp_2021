@@ -1,19 +1,29 @@
-const express = require('express');
-const morgan = require('morgan');
-const path = require('path');
+const express = require("express");
+const morgan = require("morgan");
+const path = require("path");
 
-const ErrorHandler = require('./utils/errorHandler');
-const globalErrorHandler = require('./controllers/errorController');
+//Security packages
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
-const tourRoutes = require('./routes/tourRouter');
-const userRoutes = require('./routes/userRouter');
+const ErrorHandler = require("./utils/errorHandler");
+const globalErrorHandler = require("./controllers/errorController");
+
+const tourRoutes = require("./routes/tourRouter");
+const userRoutes = require("./routes/userRouter");
 
 const app = express();
 
 //Middleware structure in the middleware cycle
 
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+//Set security HTTP headers
+app.use(helmet());
+
+//Development logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
 
   // app.use((req, res, next) => {
   //   //Adding req property
@@ -23,18 +33,38 @@ if (process.env.NODE_ENV === 'development') {
   // });
 }
 
-//middlewares
+//Middlewares
 
-app.use(express.json());
+//Limit rate mw
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP, please try it out one hour later",
+});
 
-//Serving Static Variables;
-app.use(express.static(path.resolve(__dirname, 'public')));
+app.use("/api", limiter);
 
-app.use('/api/v1/tours', tourRoutes);
-app.use('/api/v1/users', userRoutes);
+// Body parser, reading the data that comes in from req.body.
+app.use(
+  express.json({
+    limit: "10kb",
+  })
+);
+
+// Data satization agains NOSQL query injection
+app.use(mongoSanitize());
+
+// Data sanatization agains XSS
+app.use(xss());
+
+// Serving Static Variables
+app.use(express.static(path.resolve(__dirname, "public")));
+
+app.use("/api/v1/tours", tourRoutes);
+app.use("/api/v1/users", userRoutes);
 
 //Router handler - For routes that doesn't exists
-app.all('*', (req, res, next) => {
+app.all("*", (req, res, next) => {
   next(new ErrorHandler(`Cannot find ${req.originalUrl} on this server`, 404));
   // res.status(404).json({
   //   status: 'Fail',
