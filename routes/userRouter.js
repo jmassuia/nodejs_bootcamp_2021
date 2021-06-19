@@ -4,6 +4,7 @@ const {
   getAllUsers,
   updateMyData,
   deleteMe,
+  getUser,
 } = require("../controllers/userController");
 const {
   signup,
@@ -18,6 +19,7 @@ const {
 
 //GETs requests
 userRouter.get("/", getAllUsers);
+userRouter.get("/:id", getUser);
 //POSTs requests
 userRouter.post("/signup", signup);
 userRouter.post("/login", login);

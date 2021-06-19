@@ -67,10 +67,18 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  return res.status(505).json({
-    status: "Error",
-    message: "Route is not defined yet!",
+exports.getUser = async (req, res) => {
+  const id = req.params.id;
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    new AppError("User does not exist, please insert a valid userid");
+  }
+
+  return res.status(200).json({
+    status: "Successful",
+    data: user,
   });
 };
 exports.createUser = (req, res) => {

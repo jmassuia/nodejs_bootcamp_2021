@@ -1,11 +1,11 @@
-const Tour = require('../models/tourSchema');
-const APIFeatures = require('../utils/apiFeatures');
+const Tour = require("../models/tourSchema");
+const APIFeatures = require("../utils/apiFeatures");
 
 module.exports = {
   aliasTopTours(req, res, next) {
-    req.query.limit = '5';
-    req.query.sort = '-ratingsAverage,price';
-    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    req.query.limit = "5";
+    req.query.sort = "-ratingsAverage,price";
+    req.query.fields = "name,price,ratingsAverage,summary,difficulty";
     next();
   },
   async getToursStats(req, res) {
@@ -16,13 +16,13 @@ module.exports = {
         },
         {
           $group: {
-            _id: '$difficulty',
+            _id: "$difficulty",
             numTours: { $sum: 1 },
-            numRatings: { $sum: '$ratingsQuantity' },
-            avgRating: { $avg: '$ratingsAverage' },
-            avgPrice: { $avg: '$price' },
-            minPrice: { $min: '$price' },
-            maxPrice: { $max: '$price' },
+            numRatings: { $sum: "$ratingsQuantity" },
+            avgRating: { $avg: "$ratingsAverage" },
+            avgPrice: { $avg: "$price" },
+            minPrice: { $min: "$price" },
+            maxPrice: { $max: "$price" },
           },
         },
         {
@@ -33,7 +33,7 @@ module.exports = {
       ]);
 
       return res.status(200).json({
-        status: 'Sucessfull',
+        status: "Sucessfull",
         data: {
           stats,
         },
@@ -41,7 +41,7 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return res.status(500).json({
-        status: 'fail',
+        status: "fail",
         err,
       });
     }
@@ -52,7 +52,7 @@ module.exports = {
 
       const plan = await Tour.aggregate([
         {
-          $unwind: '$startDates',
+          $unwind: "$startDates",
         },
         {
           $match: {
@@ -64,13 +64,13 @@ module.exports = {
         },
         {
           $group: {
-            _id: { $month: '$startDates' },
+            _id: { $month: "$startDates" },
             numTourStarts: { $sum: 1 },
-            tours: { $push: '$name' },
+            tours: { $push: "$name" },
           },
         },
         {
-          $addFields: { month: '$_id' },
+          $addFields: { month: "$_id" },
         },
         {
           $project: {
@@ -83,14 +83,14 @@ module.exports = {
       ]);
 
       return res.status(200).json({
-        status: 'Successful',
+        status: "Successful",
         data: {
           plan,
         },
       });
     } catch (err) {
       return res.status(404).json({
-        status: 'Fail',
+        status: "Fail",
         message: err,
       });
     }
@@ -151,7 +151,7 @@ module.exports = {
       const tours = await features.query;
 
       return res.status(200).json({
-        status: 'Successful',
+        status: "Successful",
         results: tours.length,
         data: {
           tours,
@@ -160,7 +160,7 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return res.status(404).json({
-        status: 'Fail',
+        status: "Fail",
         message: err,
       });
     }
@@ -172,32 +172,35 @@ module.exports = {
       let tour = await Tour.findById(id);
 
       return res.status(200).json({
-        status: 'Successful',
+        status: "Successful",
         data: {
           tour,
         },
       });
     } catch (err) {
       return res.status(404).json({
-        status: 'Fail',
-        message: 'Tour not found',
+        status: "Fail",
+        message: "Tour not found",
       });
     }
   },
   async create(req, res) {
     try {
       const data = req.body;
+      console.log(data);
+
       const tour = await Tour.create(data);
 
       return res.status(202).json({
-        status: 'User created successfully',
+        status: "Tour created successfully",
         data: {
           tour,
         },
       });
     } catch (err) {
+      console.log(err);
       return res.status(503).json({
-        staus: 'unsuccesfull',
+        status: "unsuccesful",
         message: err,
       });
     }
@@ -212,15 +215,15 @@ module.exports = {
       });
 
       return res.status(200).json({
-        status: 'Successful',
+        status: "Successful",
         data: {
           tour,
         },
       });
     } catch (err) {
       return res.status(404).json({
-        status: 'Fail',
-        message: 'Tour not updated',
+        status: "Fail",
+        message: "Tour not updated",
         error: err,
       });
     }
@@ -231,12 +234,12 @@ module.exports = {
       await Tour.findByIdAndDelete(id);
 
       return res.status(200).json({
-        status: 'Successful',
+        status: "Successful",
       });
     } catch (err) {
       return res.status(404).json({
-        status: 'Fail',
-        message: 'Tour could not be deleted',
+        status: "Fail",
+        message: "Tour could not be deleted",
       });
     }
   },
