@@ -1,5 +1,6 @@
 const Tour = require("../models/tourSchema");
 const APIFeatures = require("../utils/apiFeatures");
+const factory = require(".././controllers/handlerFactor");
 
 module.exports = {
   aliasTopTours(req, res, next) {
@@ -169,7 +170,7 @@ module.exports = {
     try {
       const id = req.params.id;
 
-      let tour = await Tour.findById(id);
+      let tour = await Tour.findById(id).populate("reviews");
 
       return res.status(200).json({
         status: "Successful",

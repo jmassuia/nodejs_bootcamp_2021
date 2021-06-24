@@ -3,6 +3,10 @@ const path = require("path");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const Tour = require("../../models/tourSchema");
+const User = require("../../models/userSchema");
+const Review = require("../../models/reviewSchema");
+
+
 
 const test = dotenv.config({
   path: path.resolve(__dirname, "..", "..", "config.env"),
@@ -19,11 +23,11 @@ mongoose
   })
   .then((res) => console.log("Database connection established!!"));
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`, "utf-8"));
 
 const importData = async () => {
   try {
-    await Tour.create(tours);
+    await Review.create(tours);
     return console.log("Objects created");
   } catch (err) {
     return console.log(err);

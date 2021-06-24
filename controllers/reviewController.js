@@ -1,9 +1,14 @@
 const Review = require(".././models/reviewSchema");
 const catchAsync = require(".././utils/catchAsync");
 const AppError = require(".././utils/errorHandler");
+const factory = require(".././controllers/handlerFactor");
 
 exports.index = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  //Filtering in case a specific tour is passed in the route
+  if (req.params.tourId) filter = { tour: req.params.tourId };
+
+  const reviews = await Review.find(filter);
   // .populate({ path: "tour" })
   // .populate({ path: "user" });
 
@@ -15,14 +20,18 @@ exports.index = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.create = catchAsync(async (req, res, next) => {
-  //Receiving data from body
-  const data = req.body;
-  //Saving new Review
-  await Review.create(data);
-  //Response
-  res.status(201).json({
-    status: "Successful",
-  });
+exports.setTourUserId = (req, res, next) => {
+  //Getting tour and user ids in case they are not passed into req.body
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id; //from protect middleware
   next();
-});
+};
+
+//Get review
+exports.getReview = factory.getOne(Review);
+//Create reviews
+exports.createReview = factory.createOne(Review);
+//Update reviews
+exports.updateReview = factory.updateOne(Review);
+//Delete reviews
+exports.deleteReview = factory.deleteOne(Review);

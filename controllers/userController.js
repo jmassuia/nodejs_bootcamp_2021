@@ -1,5 +1,6 @@
 const User = require("../models/userSchema");
 const catchAsync = require("../utils/catchAsync");
+const factory = require(".././controllers/handlerFactor");
 
 const AppError = require("../utils/errorHandler");
 
@@ -15,20 +16,15 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  //Get all users that are active
-  const users = await User.find();
+exports.getAllUsers = factory.getAll(User);
 
-  return res.status(200).json({
-    status: "Successful",
-    data: {
-      users,
-    },
-  });
-});
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
 
 //Update the current authenticated user
-exports.updateMyData = catchAsync(async (req, res, next) => {
+exports.updateMe = catchAsync(async (req, res, next) => {
   //1 Create an error if the user tries to POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -67,35 +63,11 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = async (req, res) => {
-  const id = req.params.id;
+//Get one user
+exports.getUser = factory.getOne(User);
 
-  const user = await User.findById(id);
+//Update user data
+exports.updateUser = factory.updateOne(User);
 
-  if (!user) {
-    new AppError("User does not exist, please insert a valid userid");
-  }
-
-  return res.status(200).json({
-    status: "Successful",
-    data: user,
-  });
-};
-exports.createUser = (req, res) => {
-  return res.status(505).json({
-    status: "Error",
-    message: "Route is not defined yet!",
-  });
-};
-exports.updateUser = (req, res) => {
-  return res.status(505).json({
-    status: "Error",
-    message: "Route is not defined yet!",
-  });
-};
-exports.deleteUser = (req, res) => {
-  return res.status(505).json({
-    status: "Error",
-    message: "Route is not defined yet!",
-  });
-};
+//Delete user based on its id
+exports.deleteUser = factory.deleteOne(User);

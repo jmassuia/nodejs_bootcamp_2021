@@ -100,9 +100,9 @@ tourSchema.virtual("durationWeeks").get(function () {
 });
 
 tourSchema.virtual("reviews", {
-  ref: "Review",
-  localField: "_id",
-  foreignField: "tour",
+  ref: "Review", //Refer to the Review schema
+  localField: "_id", // Where tour id
+  foreignField: "tour", // is equal to tour id on review schema
 });
 
 // Document middleware - pre: runs before save and create events
