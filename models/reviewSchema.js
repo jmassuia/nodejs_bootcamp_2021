@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+//For some reason, importing the model is not working properly.Temp fix applied using mongoose.model direct call
 const Tour = require("./tourSchema");
 
 const reviewSchema = new mongoose.Schema(
@@ -64,7 +65,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   ]);
   console.log(stats);
 
-  await Tour.findByIdAndUpdate(tourId, {
+  await mongoose.model("Tour").findByIdAndUpdate(tourId, {
     ratingsQuantity: stats[0].nRating,
     ratingsAverage: stats[0].avgRating,
   });
