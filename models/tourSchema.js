@@ -94,6 +94,14 @@ const tourSchema = new Schema(
   }
 );
 
+//Simple index
+// 1 = acendent -1 = descendant
+
+// tourSchema.index({ price: 1 });
+
+//Compound indexes
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+
 //Virtual properties
 tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
@@ -161,6 +169,6 @@ tourSchema.pre("aggregate", function (next) {
   next();
 });
 
-const Tour = mongoose.model("Tour", tourSchema);
+const Tour = new mongoose.model("Tour", tourSchema);
 
 module.exports = Tour;

@@ -6,8 +6,6 @@ const Tour = require("../../models/tourSchema");
 const User = require("../../models/userSchema");
 const Review = require("../../models/reviewSchema");
 
-
-
 const test = dotenv.config({
   path: path.resolve(__dirname, "..", "..", "config.env"),
 });
@@ -23,11 +21,17 @@ mongoose
   })
   .then((res) => console.log("Database connection established!!"));
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`, "utf-8"));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, "utf-8"));
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, "utf-8")
+);
 
 const importData = async () => {
   try {
-    await Review.create(tours);
+    await Tour.create(tours);
+    await User.create(users, { validateBeforeSave: false });
+    await Review.create(reviews);
     return console.log("Objects created");
   } catch (err) {
     return console.log(err);
@@ -37,6 +41,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
     return console.log("Objects deleted");
   } catch (err) {
     return console.log(err);

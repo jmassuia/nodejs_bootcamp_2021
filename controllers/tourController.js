@@ -149,6 +149,8 @@ module.exports = {
         .limitFields()
         .pagination();
 
+      //Getting DB reading statistics with explain method
+      // const tours = await features.query.explain();
       const tours = await features.query;
 
       return res.status(200).json({
