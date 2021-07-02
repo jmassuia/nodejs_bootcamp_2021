@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 //For some reason, importing the model is not working properly.Temp fix applied using mongoose.model direct call
-const Tour = require("./tourSchema");
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -35,6 +34,10 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+//Indexes
+// Setting unique options to avoid duplicate reviews from the same user on the same tour
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 //model middlewares
 
 //pre middlewares
@@ -65,10 +68,17 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   ]);
   console.log(stats);
 
-  await mongoose.model("Tour").findByIdAndUpdate(tourId, {
-    ratingsQuantity: stats[0].nRating,
-    ratingsAverage: stats[0].avgRating,
-  });
+  if (stats.length > 0) {
+    await mongoose.model("Tour").findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await mongoose.model("Tour").findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 4.5,
+    });
+  }
 };
 
 reviewSchema.post("save", function () {
@@ -76,6 +86,19 @@ reviewSchema.post("save", function () {
   // Review.calcAverage() would not work because the schema is not created at this point
   // So this.construct can be used instead.
   this.constructor.calcAverageRatings(this.tour);
+});
+
+//pre middleware is required because this is the only way we could access and query documents before
+//updating it
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.reviewDoc = await this.findOne();
+  console.log(this.reviewDoc);
+  next();
+});
+
+//Then, after getting the exact document, it's possible to use the static function on reviewDoc constructor
+reviewSchema.post(/^findOneAnd/, async function () {
+  await this.reviewDoc.constructor.calcAverageRatings(this.reviewDoc.tour);
 });
 
 const Review = new mongoose.model("Review", reviewSchema);

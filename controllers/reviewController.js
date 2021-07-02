@@ -12,7 +12,7 @@ exports.index = catchAsync(async (req, res, next) => {
   // .populate({ path: "tour" })
   // .populate({ path: "user" });
 
-  res.status(200).json({
+  return res.status(200).json({
     status: "Successful",
     results: reviews.length,
     data: reviews,
