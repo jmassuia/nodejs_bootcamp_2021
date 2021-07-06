@@ -17,6 +17,12 @@ const reviewRoutes = require("./routes/reviewRouter");
 
 const app = express();
 
+//Setting up the server-side view engine
+app.set("view engine", "pug");
+app.set("views", path.resolve(__dirname, "views"));
+
+// Serving Static Variables
+app.use(express.static(path.resolve(__dirname, "public")));
 //Middleware structure in the middleware cycle
 
 //Set security HTTP headers
@@ -58,8 +64,24 @@ app.use(mongoSanitize());
 // Data sanatization agains XSS
 app.use(xss());
 
-// Serving Static Variables
-app.use(express.static(path.resolve(__dirname, "public")));
+app.get("/", (req, res) => {
+  res.status(200).render("base", {
+    tour: "Test local variable",
+    user: "Joao Vitor Massuia",
+  });
+});
+
+app.get("/overview", (req, res) => {
+  res.status(200).render("overview", {
+    title: "All tours",
+  });
+});
+
+app.get("/tour", (req, res) => {
+  res.status(200).render("tour", {
+    title: "The Forest Hiker",
+  });
+});
 
 app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);

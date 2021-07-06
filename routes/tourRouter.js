@@ -8,6 +8,8 @@ const {
   create,
   update,
   deleteTour,
+  getTourWithin,
+  getDistances,
 } = require("../controllers/tourController");
 
 const { protect, restrictTo } = require("../controllers/authController");
@@ -20,8 +22,22 @@ tourRouter.use("/:tourId/reviews", reviewRouter);
 tourRouter.route("/top-5-cheap").get(aliasTopTours, index);
 
 tourRouter.route("/tour-stats").get(getToursStats);
-tourRouter.route("/monthly-plan/:year").get(protect,restrictTo("admin","lead-guide","guide"),getMonthlyPlan);
-tourRouter.route("/").get(index).post(protect,restrictTo("admin","lead-guide"),create);
+tourRouter
+  .route("/monthly-plan/:year")
+  .get(protect, restrictTo("admin", "lead-guide", "guide"), getMonthlyPlan);
+
+//Geospacial queries
+tourRouter
+  .route("/tour-within/:distance/center/:latlng/unit/:unit")
+  .get(getTourWithin);
+//tour-whitin/45/center/-45,32/unit/km
+
+tourRouter.route("/distances/:latlng/unit/:unit").get(getDistances);
+
+tourRouter
+  .route("/")
+  .get(index)
+  .post(protect, restrictTo("admin", "lead-guide"), create);
 
 tourRouter
   .route("/:id")
