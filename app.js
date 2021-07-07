@@ -14,6 +14,7 @@ const globalErrorHandler = require("./controllers/errorController");
 const tourRoutes = require("./routes/tourRouter");
 const userRoutes = require("./routes/userRouter");
 const reviewRoutes = require("./routes/reviewRouter");
+const viewRoutes = require("./routes/viewRouter");
 
 const app = express();
 
@@ -64,25 +65,7 @@ app.use(mongoSanitize());
 // Data sanatization agains XSS
 app.use(xss());
 
-app.get("/", (req, res) => {
-  res.status(200).render("base", {
-    tour: "Test local variable",
-    user: "Joao Vitor Massuia",
-  });
-});
-
-app.get("/overview", (req, res) => {
-  res.status(200).render("overview", {
-    title: "All tours",
-  });
-});
-
-app.get("/tour", (req, res) => {
-  res.status(200).render("tour", {
-    title: "The Forest Hiker",
-  });
-});
-
+app.use("/", viewRoutes);
 app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
