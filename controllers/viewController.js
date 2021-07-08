@@ -18,10 +18,10 @@ exports.getTour = catchAsync(async (req, res) => {
   const slug = req.params.slug;
   const tour = await Tour.findOne({ slug: `${slug}` });
 
-  console.log(tour);
   // 2) Build the template using the data got in step 1
   // 3) Render data
   res.status(200).render("tour", {
+    title: tour.name,
     tour,
   });
 });
