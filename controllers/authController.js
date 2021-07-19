@@ -35,7 +35,6 @@ const createSendToken = (user, statusCode, res) => {
 
   //Removing the password from the  body
   user.password = undefined;
-
   res.status(statusCode).json({
     status: "Success!",
     token,
@@ -87,7 +86,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //Getting JWT for newUser and sending the response to the client
   createSendToken(user, 200, res);
-
   // //If everything is ok, send the token
   // const token = signToken(user._id);
   // res.status(200).json({
@@ -96,15 +94,48 @@ exports.login = catchAsync(async (req, res, next) => {
   // });
 });
 
+// Only check if the user is logged or not. Valid for rendered pages
+exports.isLoggedIn = async (req, res, next) => {
+  let token;
+
+  //Validating if the token was beared
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+
+    // 2) Token validation
+    //                              function    Calling the function
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3) Check if user still exits
+    const freshUser = await User.findById(decoded.id);
+    if (!freshUser) {
+      return next();
+    }
+    // 4) If user changed passwords after the token was issued
+    if (freshUser.passwordChanged(decoded.iat)) {
+      return next();
+    }
+
+    //In case there's a logging user
+    res.locals.user = freshUser;
+  }
+  next();
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Get the token and check if it's there
   let token;
 
-  const bearerToken = req.headers.authorization.split(" ");
+  // const bearerToken = req.headers.authorization.split(" ");
 
   //Validating if the token was beared
-  if (req.headers.authorization && bearerToken[0] === "Bearer") {
-    token = bearerToken[1];
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === "Bearer"
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {

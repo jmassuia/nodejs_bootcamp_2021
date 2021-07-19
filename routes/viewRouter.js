@@ -1,6 +1,12 @@
 const viewRouter = require("express").Router();
 
-const { getOverview, getTour } = require("../controllers/viewController");
+const {
+  getOverview,
+  getTour,
+  login,
+} = require("../controllers/viewController");
+
+const { protect, isLoggedIn } = require("../controllers/authController");
 
 // viewRouter.get("/", (req, res) => {
 //   res.status(200).render("base", {
@@ -9,8 +15,12 @@ const { getOverview, getTour } = require("../controllers/viewController");
 //   });
 // });
 
+viewRouter.use(isLoggedIn);
+
 viewRouter.get("/overview", getOverview);
 
-viewRouter.get("/tour/:slug", getTour);
+viewRouter.get("/tour/:slug", protect, getTour);
+
+viewRouter.get("/login", login);
 
 module.exports = viewRouter;

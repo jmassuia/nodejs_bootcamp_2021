@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 //Security packages
 const rateLimit = require("express-rate-limit");
@@ -58,6 +59,8 @@ app.use(
     limit: "10kb",
   })
 );
+
+app.use(cookieParser());
 
 // Data satization agains NOSQL query injection
 app.use(mongoSanitize());
