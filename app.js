@@ -8,6 +8,7 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const cors = require("cors");
 
 const ErrorHandler = require("./utils/errorHandler");
 const globalErrorHandler = require("./controllers/errorController");
@@ -19,6 +20,7 @@ const viewRoutes = require("./routes/viewRouter");
 
 const app = express();
 
+app.use(cors());
 //Setting up the server-side view engine
 app.set("view engine", "pug");
 app.set("views", path.resolve(__dirname, "views"));

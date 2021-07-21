@@ -6,7 +6,7 @@ const {
   login,
 } = require("../controllers/viewController");
 
-const { protect, isLoggedIn } = require("../controllers/authController");
+const { isLoggedIn, logout } = require("../controllers/authController");
 
 // viewRouter.get("/", (req, res) => {
 //   res.status(200).render("base", {
@@ -17,9 +17,9 @@ const { protect, isLoggedIn } = require("../controllers/authController");
 
 viewRouter.use(isLoggedIn);
 
-viewRouter.get("/overview", getOverview);
+viewRouter.get("/", getOverview);
 
-viewRouter.get("/tour/:slug", protect, getTour);
+viewRouter.get("/tour/:slug", getTour);
 
 viewRouter.get("/login", login);
 

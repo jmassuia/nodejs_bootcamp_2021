@@ -94,6 +94,18 @@ exports.login = catchAsync(async (req, res, next) => {
   // });
 });
 
+//Remove the cookies
+exports.logout = catchAsync(async (req, res, next) => {
+  //Reset the cookie
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 5000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: "Success!",
+  });
+});
+
 // Only check if the user is logged or not. Valid for rendered pages
 exports.isLoggedIn = async (req, res, next) => {
   let token;

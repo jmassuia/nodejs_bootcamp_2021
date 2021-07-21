@@ -1,6 +1,14 @@
-const login = async (email, password) => {
+import axios from "axios";
+
+import { showAlert } from "./alert";
+
+export const login = async (email, password) => {
+  // Get element values
+  // const email = document.getElementById("email").value;
+  // const password = document.querySelector("input#password").value;
+
   try {
-    const res = await axios({
+    const result = await axios({
       method: "POST",
       url: "http://localhost:8888/api/v1/users/login",
       data: {
@@ -8,20 +16,21 @@ const login = async (email, password) => {
         password,
       },
     });
-
-    console.log(res);
+    if (result.status === 200) {
+      showAlert("success", "Logged successfully!");
+      window.setTimeout(() => {
+        location.assign("/");
+      }, 1500);
+    }
   } catch (err) {
-    console.log(err.response.data);
+    showAlert("error", err.response.data.message);
   }
 };
 
-document.querySelector(".form").addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  // Get element values
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  console.log(email);
-  console.log(password);
-  login(email, password);
-});
+export const logout = async () => {
+  try {
+    await axios.get("http://localhost:8888/api/v1/users/logout");
+  } catch (err) {
+    showAlert("error", err);
+  }
+};
