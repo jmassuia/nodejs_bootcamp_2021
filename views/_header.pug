@@ -6,9 +6,9 @@ hearder.header
     nav.nav.nav--users
         if user
             button.nav__el.nav__el--logout Log out
-            a.nav__el(href="#")
-            img(src=`/img/users/${user.photo}` alt=`${user.name}` class="nav__user-img")
-            span= user.name.split(' ')[0]
+            a.nav__el(href="/account")
+                img(src=`/img/users/${user.photo}` alt=`${user.name}` class="nav__user-img")
+                span= user.name.split(' ')[0]
         else
             a.nav__el(href='/login') Log in
-            a.nav_el.nav__el--cta Sign Up
+            a.nav_el.nav__el--cta(href='#') Sign Up

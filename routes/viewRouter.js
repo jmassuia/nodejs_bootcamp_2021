@@ -4,9 +4,10 @@ const {
   getOverview,
   getTour,
   login,
+  account,
 } = require("../controllers/viewController");
 
-const { isLoggedIn, logout } = require("../controllers/authController");
+const { protect, isLoggedIn } = require("../controllers/authController");
 
 // viewRouter.get("/", (req, res) => {
 //   res.status(200).render("base", {
@@ -17,10 +18,11 @@ const { isLoggedIn, logout } = require("../controllers/authController");
 
 viewRouter.use(isLoggedIn);
 
-viewRouter.get("/", getOverview);
+viewRouter.get("/", isLoggedIn, getOverview);
 
-viewRouter.get("/tour/:slug", getTour);
+viewRouter.get("/tour/:slug", isLoggedIn, getTour);
 
-viewRouter.get("/login", login);
+viewRouter.get("/login", isLoggedIn, login);
+viewRouter.get("/account", protect, account);
 
 module.exports = viewRouter;
