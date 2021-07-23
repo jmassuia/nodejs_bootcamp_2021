@@ -5,6 +5,7 @@ const {
   getTour,
   login,
   account,
+  updateUserData,
 } = require("../controllers/viewController");
 
 const { protect, isLoggedIn } = require("../controllers/authController");

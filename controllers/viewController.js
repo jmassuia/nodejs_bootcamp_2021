@@ -1,4 +1,5 @@
 const Tour = require("../models/tourSchema");
+const User = require("../models/userSchema");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/errorHandler");
 
@@ -48,5 +49,33 @@ exports.login = async (req, res) => {
 };
 
 exports.account = async (req, res) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self' https://*.mapbox.com ws://localhost:*/ ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr * ;style-src *;upgrade-insecure-requests;"
+  );
+
   res.status(200).render("account", { title: "My profile" });
 };
+
+// exports.updateUserData = catchAsync(async (req, res, next) => {
+//   console.log(req.body);
+//   //Receiving data from the request body.
+//   const { name, email } = req.body;
+//   //update user data
+//   const user = await User.findByIdAndUpdate(
+//     req.user.id,
+//     {
+//       name,
+//       email,
+//     },
+//     {
+//       new: true,
+//       runValidators: true,
+//     }
+//   );
+
+//   return res.status(201).render('account',{
+//     title: "Your Account",
+//     user,
+//   });
+// });

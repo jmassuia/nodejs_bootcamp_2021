@@ -62,6 +62,9 @@ app.use(
   })
 );
 
+//Enabling HTML parser coming from submited request.
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
 app.use(cookieParser());
 
 // Data satization agains NOSQL query injection
