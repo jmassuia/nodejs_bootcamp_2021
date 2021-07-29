@@ -39,17 +39,18 @@ if (logoutBtn) {
 if (userSettingsForm) {
   userSettingsForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
 
-    const data = { name, email };
+    const formSettings = new FormData();
+    formSettings.append("name", document.getElementById("name").value);
+    formSettings.append("email", document.getElementById("email").value);
+    formSettings.append("photo", document.getElementById("photo").files[0]);
 
-    console.log(name, email);
-    updateSettings(data, "settings");
+    console.log(formSettings);
+    updateSettings(formSettings, "data");
 
-    window.setTimeout(() => {
-      location.assign("/");
-    }, 1500);
+    // window.setTimeout(() => {
+    //   location.assign("/");
+    // }, 1500);
   });
 }
 

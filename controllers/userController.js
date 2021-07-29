@@ -56,6 +56,8 @@ exports.resizeUserPhoto = (req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
+
+  next();
 };
 
 exports.getAllUsers = factory.getAll(User);
