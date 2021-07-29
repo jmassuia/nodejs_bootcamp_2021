@@ -1,5 +1,7 @@
 const userRouter = require("express").Router();
+const path = require("path");
 // const {} = require('../controllers/userController');
+
 const {
   getAllUsers,
   getMe,
@@ -8,6 +10,8 @@ const {
   updateUser,
   deleteMe,
   deleteUser,
+  uploadUserPhoto,
+  resizeUserPhoto,
 } = require("../controllers/userController");
 const {
   signup,
@@ -39,7 +43,7 @@ userRouter.get("/me", getMe, getUser);
 userRouter.get("/:id", restrictTo("admin", "lead-guide"), getUser);
 
 //PATCHs requests
-userRouter.patch("/updateMe", updateMe);
+userRouter.patch("/updateMe", uploadUserPhoto, resizeUserPhoto, updateMe);
 userRouter.patch(
   "/updateUser/:id",
   restrictTo("admin", "lead-guide"),

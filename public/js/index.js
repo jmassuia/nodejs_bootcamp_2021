@@ -8,7 +8,7 @@ const mapBox = document.getElementById("map");
 const form = document.querySelector("form.form--login");
 const logoutBtn = document.querySelector("button.nav__el--logout");
 const userSettingsForm = document.querySelector("form.form-user-data");
-const userPasswordForm = document.querySelector("form.form-user-data");
+const userPasswordForm = document.querySelector("form.form-user-settings");
 
 //Delegation
 if (mapBox) {

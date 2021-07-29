@@ -8653,7 +8653,7 @@ var updateSettings = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            url = type === "password" ? "updateMyPassword" : "udpate";
+            url = type === "password" ? "updateMyPassword" : "updateMe";
             _context.next = 4;
             return _axios.default.patch("http://localhost:8888/api/v1/users/".concat(url), data);
 
@@ -8973,7 +8973,7 @@ var mapBox = document.getElementById("map");
 var form = document.querySelector("form.form--login");
 var logoutBtn = document.querySelector("button.nav__el--logout");
 var userSettingsForm = document.querySelector("form.form-user-data");
-var userPasswordForm = document.querySelector("form.form-user-data"); //Delegation
+var userPasswordForm = document.querySelector("form.form-user-settings"); //Delegation
 
 if (mapBox) {
   var locations = JSON.parse(mapBox.dataset.locations);
@@ -9103,7 +9103,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62489" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64341" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
