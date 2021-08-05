@@ -6,7 +6,7 @@ const AppError = require("./../utils/errorHandler");
 
 const crypto = require("crypto");
 
-const sendEmail = require("../utils/nodemailer");
+const Email = require("../utils/nodemailer");
 
 //Generate json web token using user._id and a secret key.
 const signToken = (id) => {
@@ -51,6 +51,10 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   //Creating user
   const newUser = await User.create(user);
+
+  let url = `${req.protocol}://${req.get("host")}/account`;
+  console.log(url);
+  await new Email(newUser, url).sendWelcome();
 
   //Getting JWT for newUser and sending the response to the client
   createSendToken(newUser, 201, res);
@@ -233,11 +237,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   //Try catch block in order to get any error related to the service itself
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Reset your password (Valid for the next 10 mins)",
-      message,
-    });
+    // await sendEmail({
+    //   email: user.email,
+    //   subject: "Reset your password (Valid for the next 10 mins)",
+    //   message,
+    // });
 
     res.status(200).json({
       status: "Success",

@@ -314,6 +314,7 @@ body {
   -ms-flex-align: center;
   align-items: center;
 }
+
 @media only screen and (max-width: 62.5em) {
   .header {
     -webkit-box-orient: vertical;
@@ -322,9 +323,15 @@ body {
     flex-direction: column;
   }
 }
-.header__logo img {
+
+.header__Logo {
+  padding-right: 50vh;
+}
+
+.header__Logo img {
   height: 3.5rem;
 }
+
 @media only screen and (max-width: 62.5em) {
   .header__logo {
     -webkit-box-ordinal-group: 0;
