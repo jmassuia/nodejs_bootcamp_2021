@@ -10,18 +10,25 @@ module.exports = class Email {
     this.from = `Joao Vitor Massuia Roberto <${process.env.MAIL_FROM}>`;
   }
   newTransport() {
-    if (process.env.NODE_ENV === "Production") {
+    if (process.env.NODE_ENV === "production") {
       //Sendgrid
-      return 0;
+      return nodemailer.createTransport({
+        service: "SendGrid",
+        auth: {
+          user: process.env.SENDGRID_USER,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
+    } else {
+      return nodemailer.createTransport({
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        auth: {
+          user: process.env.MAIL_USERNAME,
+          pass: process.env.MAIL_PWD,
+        },
+      });
     }
-    return nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: process.env.MAIL_PORT,
-      auth: {
-        user: process.env.MAIL_USERNAME,
-        pass: process.env.MAIL_PWD,
-      },
-    });
   }
   async send(template, subject) {
     //Send the actual email
@@ -51,6 +58,12 @@ module.exports = class Email {
   }
   async sendWelcome() {
     await this.send("welcome", "Welcome to the natours family");
+  }
+  async sendPasswordReset() {
+    await this.send(
+      "passwordReset",
+      "Your password reset token (valid for only 10 minutes)"
+    );
   }
 };
 

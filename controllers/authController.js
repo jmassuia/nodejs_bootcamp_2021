@@ -53,7 +53,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(user);
 
   let url = `${req.protocol}://${req.get("host")}/account`;
-  console.log(url);
   await new Email(newUser, url).sendWelcome();
 
   //Getting JWT for newUser and sending the response to the client
@@ -228,20 +227,17 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send the token to its e-mail
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password 
-  and passwordConfirm to: \n${resetURL}\n, If you didn't forget your password, please disregard this email`;
+  // const message = `Forgot your password? Submit a PATCH request with your new password
+  // and passwordConfirm to: \n${resetURL}\n, If you didn't forget your password, please disregard this email`;
 
   //Try catch block in order to get any error related to the service itself
   try {
-    // await sendEmail({
-    //   email: user.email,
-    //   subject: "Reset your password (Valid for the next 10 mins)",
-    //   message,
-    // });
+    const resetURL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/v1/users/resetPassword/${resetToken}`;
+
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: "Success",
