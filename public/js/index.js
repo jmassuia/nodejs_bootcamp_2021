@@ -59,7 +59,6 @@ if (userSettingsForm) {
     formSettings.append("email", document.getElementById("email").value);
     formSettings.append("photo", document.getElementById("photo").files[0]);
 
-    console.log(formSettings);
     updateSettings(formSettings, "data");
 
     // window.setTimeout(() => {

@@ -292,7 +292,6 @@ module.exports = {
   async create(req, res) {
     try {
       const data = req.body;
-      console.log(data);
 
       const tour = await Tour.create(data);
 

@@ -10,7 +10,7 @@ export const login = async (email, password) => {
   try {
     const result = await axios({
       method: "POST",
-      url: "http://localhost:8888/api/v1/users/login",
+      url: "/api/v1/users/login",
       data: {
         email,
         password,
@@ -29,7 +29,7 @@ export const login = async (email, password) => {
 
 export const logout = async () => {
   try {
-    await axios.get("http://localhost:8888/api/v1/users/logout");
+    await axios.get("/api/v1/users/logout");
   } catch (err) {
     showAlert("error", err);
   }

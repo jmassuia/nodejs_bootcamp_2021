@@ -67,7 +67,6 @@ exports.getMyBookings = catchAsync(async (req, res) => {
 });
 
 exports.updateUserData = catchAsync(async (req, res, next) => {
-  console.log(req.body);
   //Receiving data from the request body.
   const { name, email } = req.body;
   //update user data

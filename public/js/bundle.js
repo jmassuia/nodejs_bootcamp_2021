@@ -8510,7 +8510,7 @@ var login = /*#__PURE__*/function () {
             _context.next = 3;
             return (0, _axios.default)({
               method: "POST",
-              url: "http://localhost:8888/api/v1/users/login",
+              url: "/api/v1/users/login",
               data: {
                 email: email,
                 password: password
@@ -8558,7 +8558,7 @@ var logout = /*#__PURE__*/function () {
           case 0:
             _context2.prev = 0;
             _context2.next = 3;
-            return _axios.default.get("http://localhost:8888/api/v1/users/logout");
+            return _axios.default.get("/api/v1/users/logout");
 
           case 3:
             _context2.next = 8;
@@ -8655,7 +8655,7 @@ var updateSettings = /*#__PURE__*/function () {
             _context.prev = 0;
             url = type === "password" ? "updateMyPassword" : "updateMe";
             _context.next = 4;
-            return _axios.default.patch("http://localhost:8888/api/v1/users/".concat(url), data);
+            return _axios.default.patch("/api/v1/users/".concat(url), data);
 
           case 4:
             updateUserSettings = _context.sent;
@@ -8720,38 +8720,37 @@ var bookTour = /*#__PURE__*/function () {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return _axios.default.get("http://localhost:8888/api/v1/booking/checkout-session/".concat(tourId));
+            return _axios.default.get("/api/v1/booking/checkout-session/".concat(tourId));
 
           case 3:
             session = _context.sent;
-            console.log(session);
 
             if (session.status === 200) {
               (0, _alert.showAlert)("success", "checkout session created!");
             } // 2) Create checkout form + charge credit card
 
 
-            _context.next = 8;
+            _context.next = 7;
             return stripe.redirectToCheckout({
               sessionId: session.data.checkOutSession.id
             });
 
-          case 8:
-            _context.next = 14;
+          case 7:
+            _context.next = 13;
             break;
 
-          case 10:
-            _context.prev = 10;
+          case 9:
+            _context.prev = 9;
             _context.t0 = _context["catch"](0);
             console.log(_context.t0);
             (0, _alert.showAlert)("error", _context.t0);
 
-          case 14:
+          case 13:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 10]]);
+    }, _callee, null, [[0, 9]]);
   }));
 
   return function bookTour(_x) {
@@ -9107,7 +9106,6 @@ if (userSettingsForm) {
     formSettings.append("name", document.getElementById("name").value);
     formSettings.append("email", document.getElementById("email").value);
     formSettings.append("photo", document.getElementById("photo").files[0]);
-    console.log(formSettings);
     (0, _updateSettings.updateSettings)(formSettings, "data"); // window.setTimeout(() => {
     //   location.assign("/");
     // }, 1500);
@@ -9184,7 +9182,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61155" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53859" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
