@@ -2,11 +2,13 @@ import "@babel/polyfill";
 import { login, logout } from "./login";
 import { displayMap } from "./mapbox";
 import { updateSettings } from "./updateSettings";
+import { bookTour } from "./stripe";
 
 //DOM Elements
 const mapBox = document.getElementById("map");
 const form = document.querySelector("form.form--login");
 const logoutBtn = document.querySelector("button.nav__el--logout");
+const bookingBtn = document.getElementById("booking-btn");
 const userSettingsForm = document.querySelector("form.form-user-data");
 const userPasswordForm = document.querySelector("form.form-user-settings");
 
@@ -33,6 +35,18 @@ if (logoutBtn) {
     window.setTimeout(() => {
       location.assign("/");
     }, 1500);
+  });
+}
+
+if (bookingBtn) {
+  bookingBtn.addEventListener("click", (e) => {
+    e.preventDefault;
+    const { tourId } = e.target.dataset;
+    bookingBtn.textContent = "Processing...";
+    bookTour(tourId);
+    setTimeout(() => {
+      bookingBtn.textContent = "Book a tour";
+    }, 1000);
   });
 }
 

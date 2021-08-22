@@ -1,7 +1,16 @@
 const Tour = require("../models/tourSchema");
 const User = require("../models/userSchema");
+const Booking = require("../models/bookingSchema");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/errorHandler");
+
+exports.setPageHeaders = (req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self' *;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com  https://js.stripe.com/v3/  'self' blob: ;script-src-attr https://js.stripe.com/v3/ 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests;"
+  );
+  next();
+};
 
 exports.getOverview = catchAsync(async (req, res) => {
   // 1) Get tour data from collection
@@ -23,12 +32,6 @@ exports.getTour = catchAsync(async (req, res, next) => {
   //In case there's no tour
   if (!tour) {
     next(new AppError("No tour with this name was found!", 404));
-  } else {
-    //Setting CSP headers
-    res.setHeader(
-      "Content-Security-Policy",
-      "default-src 'self' https://*.mapbox.com ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests;"
-    );
   }
 
   // 2) Build the template using the data got in step 1
@@ -39,43 +42,49 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.login = async (req, res) => {
+exports.login = (req, res) => {
   // Rendering the page
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self' https://*.mapbox.com ws://localhost:*/ ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr * ;style-src *;upgrade-insecure-requests;"
-  );
   res.status(200).render("login", { title: "Log in" });
 };
 
-exports.account = async (req, res) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self' https://*.mapbox.com ws://localhost:*/ ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr * ;style-src *;upgrade-insecure-requests;"
-  );
-
+exports.account = (req, res) => {
   res.status(200).render("account", { title: "My profile" });
 };
 
-// exports.updateUserData = catchAsync(async (req, res, next) => {
-//   console.log(req.body);
-//   //Receiving data from the request body.
-//   const { name, email } = req.body;
-//   //update user data
-//   const user = await User.findByIdAndUpdate(
-//     req.user.id,
-//     {
-//       name,
-//       email,
-//     },
-//     {
-//       new: true,
-//       runValidators: true,
-//     }
-//   );
+exports.getMyBookings = catchAsync(async (req, res) => {
+  // 1) Find all the bookings
+  const id = req.user.id;
+  const bookings = await Booking.find({ user: id });
 
-//   return res.status(201).render('account',{
-//     title: "Your Account",
-//     user,
-//   });
-// });
+  // 2) Find tours with the reference IDs
+  const tourIDs = bookings.map((el) => el.tour.id);
+  const tours = await Tour.find({ _id: { $in: tourIDs } });
+
+  res.status(200).render("overview", {
+    title: "My bookings",
+    tours,
+  });
+});
+
+exports.updateUserData = catchAsync(async (req, res, next) => {
+  console.log(req.body);
+  //Receiving data from the request body.
+  const { name, email } = req.body;
+  //update user data
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    {
+      name,
+      email,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  return res.status(201).render("account", {
+    title: "Your Account",
+    user,
+  });
+});

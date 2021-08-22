@@ -5,10 +5,13 @@ const {
   getTour,
   login,
   account,
+  getMyBookings,
   updateUserData,
+  setPageHeaders,
 } = require("../controllers/viewController");
 
 const { protect, isLoggedIn } = require("../controllers/authController");
+const { createBookingCheckout } = require("../controllers/bookingController");
 
 // viewRouter.get("/", (req, res) => {
 //   res.status(200).render("base", {
@@ -19,11 +22,18 @@ const { protect, isLoggedIn } = require("../controllers/authController");
 
 viewRouter.use(isLoggedIn);
 
-viewRouter.get("/", isLoggedIn, getOverview);
+viewRouter.get(
+  "/",
+  setPageHeaders,
+  createBookingCheckout,
+  isLoggedIn,
+  getOverview
+);
 
-viewRouter.get("/tour/:slug", isLoggedIn, getTour);
+viewRouter.get("/tour/:slug", setPageHeaders, isLoggedIn, getTour);
 
-viewRouter.get("/login", isLoggedIn, login);
-viewRouter.get("/account", protect, account);
+viewRouter.get("/login", setPageHeaders, isLoggedIn, login);
+viewRouter.get("/account", setPageHeaders, protect, account);
+viewRouter.get("/my-bookings", setPageHeaders, protect, getMyBookings);
 
 module.exports = viewRouter;
