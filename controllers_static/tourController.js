@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 const tours = JSON.parse(
   fs.readFileSync(
-    path.resolve('..', 'starter', 'dev-data', 'data', 'tours-simple.json')
+    path.resolve("..", "starter", "dev-data", "data", "tours-simple.json")
   )
 );
 
@@ -15,8 +15,8 @@ times */
 exports.checkId = (req, res, next, val) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
-      status: 'Unsuccessfull',
-      message: 'Invalid Id',
+      status: "Unsuccessfull",
+      message: "Invalid Id",
     });
   }
   next();
@@ -26,8 +26,8 @@ exports.checkBody = (req, res, next) => {
   const tour = req.body;
   if (!tour.name || !tour.price || !tour) {
     return res.status(400).json({
-      status: 'Unsuccessfull',
-      message: 'Missing name, price or data for tour',
+      status: "Unsuccessfull",
+      message: "Missing name, price or data for tour",
     });
   }
   next();
@@ -35,7 +35,7 @@ exports.checkBody = (req, res, next) => {
 
 exports.getAllTours = (req, res) => {
   res.status(200).json({
-    status: 'Success',
+    status: "Success",
     results: tours.length,
     data: {
       tours,
@@ -47,7 +47,7 @@ exports.getTour = (req, res) => {
   const id = req.params.id * 1; //ensuring that the parameter will be a number
   const tour = tours.find((el) => el.id === id);
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
       tour,
     },
@@ -61,13 +61,12 @@ exports.createTour = (req, res) => {
   const newTour = Object.assign({ id: newId }, req.body);
 
   tours.push(newTour);
-  console.log(tours);
   fs.writeFile(
-    path.resolve('..', 'starter', 'dev-data', 'data', 'tours-simple.json'),
+    path.resolve("..", "starter", "dev-data", "data", "tours-simple.json"),
     JSON.stringify(tours),
     (err) => {
       res.status(201).json({
-        status: 'Success',
+        status: "Success",
         result: tours.length,
         data: {
           tours,
@@ -87,11 +86,11 @@ exports.updateTour = (req, res) => {
   tours[id] = tour;
 
   fs.writeFile(
-    path.resolve('..', 'starter', 'dev-data', 'data', 'tours-simple.json'),
+    path.resolve("..", "starter", "dev-data", "data", "tours-simple.json"),
     JSON.stringify(tours),
     (err) => {
       res.status(202).json({
-        status: 'Tour updated',
+        status: "Tour updated",
         result: tours.length,
         data: {
           tour,
@@ -103,7 +102,7 @@ exports.updateTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   return res.status(204).json({
-    status: 'tour deleted',
+    status: "tour deleted",
     data: null,
   });
 };

@@ -18,7 +18,7 @@ exports.getAll = (Model) =>
 exports.getOne = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     const id = req.params.id;
-    console.log(req.params.id);
+
     let query = Model.findById(id);
 
     if (popOptions) query = query.populate(popOptions);

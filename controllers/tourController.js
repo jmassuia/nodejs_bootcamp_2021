@@ -2,12 +2,43 @@ const Tour = require("../models/tourSchema");
 const APIFeatures = require("../utils/apiFeatures");
 const factory = require(".././controllers/handlerFactor");
 const AppError = require("../utils/errorHandler.js");
+const sharp = require("sharp");
 
 module.exports = {
   aliasTopTours(req, res, next) {
     req.query.limit = "5";
     req.query.sort = "-ratingsAverage,price";
     req.query.fields = "name,price,ratingsAverage,summary,difficulty";
+    next();
+  },
+  async resizeTourImages(req, res, next) {
+    if (!req.files.images || !req.files.imageCover) return next();
+
+    //1) Cover image
+    req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${req.body.imageCover}`);
+
+    //2) Other images
+    req.body.images = [];
+
+    await Promise.all(
+      req.files.images.map(async (file, i) => {
+        const fileName = `tour-${req.params.id}-${Date.now()}-image${
+          i + 1
+        }.jpeg`;
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/tours/${fileName}`);
+
+        req.body.images.push(fileName);
+      })
+    );
     next();
   },
   async getToursStats(req, res) {
@@ -261,7 +292,6 @@ module.exports = {
   async create(req, res) {
     try {
       const data = req.body;
-      console.log(data);
 
       const tour = await Tour.create(data);
 

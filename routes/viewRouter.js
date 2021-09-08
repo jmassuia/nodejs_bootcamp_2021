@@ -1,6 +1,17 @@
 const viewRouter = require("express").Router();
 
-const { getOverview, getTour } = require("../controllers/viewController");
+const {
+  getOverview,
+  getTour,
+  login,
+  account,
+  getMyBookings,
+  updateUserData,
+  setPageHeaders,
+} = require("../controllers/viewController");
+
+const { protect, isLoggedIn } = require("../controllers/authController");
+const { createBookingCheckout } = require("../controllers/bookingController");
 
 // viewRouter.get("/", (req, res) => {
 //   res.status(200).render("base", {
@@ -9,8 +20,20 @@ const { getOverview, getTour } = require("../controllers/viewController");
 //   });
 // });
 
-viewRouter.get("/overview", getOverview);
+viewRouter.use(isLoggedIn);
 
-viewRouter.get("/tour/:slug", getTour);
+viewRouter.get(
+  "/",
+  setPageHeaders,
+  createBookingCheckout,
+  isLoggedIn,
+  getOverview
+);
+
+viewRouter.get("/tour/:slug", setPageHeaders, isLoggedIn, getTour);
+
+viewRouter.get("/login", setPageHeaders, isLoggedIn, login);
+viewRouter.get("/account", setPageHeaders, protect, account);
+viewRouter.get("/my-bookings", setPageHeaders, protect, getMyBookings);
 
 module.exports = viewRouter;

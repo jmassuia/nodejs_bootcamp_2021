@@ -1,12 +1,14 @@
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const cookieParser = require("cookie-parser");
 
 //Security packages
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const cors = require("cors");
 
 const ErrorHandler = require("./utils/errorHandler");
 const globalErrorHandler = require("./controllers/errorController");
@@ -15,9 +17,11 @@ const tourRoutes = require("./routes/tourRouter");
 const userRoutes = require("./routes/userRouter");
 const reviewRoutes = require("./routes/reviewRouter");
 const viewRoutes = require("./routes/viewRouter");
+const bookingRoutes = require("./routes/bookingRouter");
 
 const app = express();
 
+app.use(cors());
 //Setting up the server-side view engine
 app.set("view engine", "pug");
 app.set("views", path.resolve(__dirname, "views"));
@@ -59,6 +63,11 @@ app.use(
   })
 );
 
+//Enabling HTML parser coming from submited request.
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+app.use(cookieParser());
+
 // Data satization agains NOSQL query injection
 app.use(mongoSanitize());
 
@@ -69,6 +78,7 @@ app.use("/", viewRoutes);
 app.use("/api/v1/tours", tourRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
+app.use("/api/v1/booking", bookingRoutes);
 
 //Router handler - For routes that doesn't exists
 app.all("*", (req, res, next) => {

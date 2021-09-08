@@ -41,7 +41,6 @@ const server = app.listen(process.env.PORT_SERVER, () => {
 
 //Handle unhandledRejection into the server
 process.on("unhandledRejection", (err) => {
-  console.log("UnhandledRejection:");
   console.log(err.name, err.message);
   //Server broking if an unhandled promise is found
   server.close(() => {
@@ -51,9 +50,17 @@ process.on("unhandledRejection", (err) => {
 
 //Handle asynchronous code
 process.on("uncaughtException", (err) => {
-  console.log("uncaughtException found:");
   console.log(err.name, err.message);
   server.close(() => {
     process.exit(1);
+  });
+});
+
+// Avoid abrupt application termination when instanced in heroku
+process.on("SIGTERM", () => {
+  console.log("SIGNTERM received!!");
+
+  server.close(() => {
+    console.log("Server terminated graceful!!");
   });
 });

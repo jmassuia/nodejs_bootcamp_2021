@@ -6,7 +6,7 @@ const AppError = require("./../utils/errorHandler");
 
 const crypto = require("crypto");
 
-const sendEmail = require("../utils/nodemailer");
+const Email = require("../utils/nodemailer");
 
 //Generate json web token using user._id and a secret key.
 const signToken = (id) => {
@@ -35,7 +35,6 @@ const createSendToken = (user, statusCode, res) => {
 
   //Removing the password from the  body
   user.password = undefined;
-
   res.status(statusCode).json({
     status: "Success!",
     token,
@@ -52,6 +51,9 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   //Creating user
   const newUser = await User.create(user);
+
+  let url = `${req.protocol}://${req.get("host")}/account`;
+  await new Email(newUser, url).sendWelcome();
 
   //Getting JWT for newUser and sending the response to the client
   createSendToken(newUser, 201, res);
@@ -87,7 +89,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   //Getting JWT for newUser and sending the response to the client
   createSendToken(user, 200, res);
-
   // //If everything is ok, send the token
   // const token = signToken(user._id);
   // res.status(200).json({
@@ -96,15 +97,60 @@ exports.login = catchAsync(async (req, res, next) => {
   // });
 });
 
+//Remove the cookies
+exports.logout = catchAsync(async (req, res, next) => {
+  //Reset the cookie
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 5000),
+    httpOnly: true,
+  });
+  res.status(200).json({
+    status: "Success!",
+  });
+});
+
+// Only check if the user is logged or not. Valid for rendered pages
+exports.isLoggedIn = async (req, res, next) => {
+  let token;
+
+  //Validating if the token was beared
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+
+    // 2) Token validation
+    //                              function    Calling the function
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    // 3) Check if user still exits
+    const freshUser = await User.findById(decoded.id);
+    if (!freshUser) {
+      return next();
+    }
+    // 4) If user changed passwords after the token was issued
+    if (freshUser.passwordChanged(decoded.iat)) {
+      return next();
+    }
+
+    //In case there's a logging user
+    res.locals.user = freshUser;
+  }
+  next();
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Get the token and check if it's there
   let token;
 
-  const bearerToken = req.headers.authorization.split(" ");
+  // const bearerToken = req.headers.authorization.split(" ");
 
   //Validating if the token was beared
-  if (req.headers.authorization && bearerToken[0] === "Bearer") {
-    token = bearerToken[1];
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.split(" ")[0] === "Bearer"
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -181,20 +227,17 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   //3) Send the token to its e-mail
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password 
-  and passwordConfirm to: \n${resetURL}\n, If you didn't forget your password, please disregard this email`;
+  // const message = `Forgot your password? Submit a PATCH request with your new password
+  // and passwordConfirm to: \n${resetURL}\n, If you didn't forget your password, please disregard this email`;
 
   //Try catch block in order to get any error related to the service itself
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Reset your password (Valid for the next 10 mins)",
-      message,
-    });
+    const resetURL = `${req.protocol}://${req.get(
+      "host"
+    )}/api/v1/users/resetPassword/${resetToken}`;
+
+    await new Email(user, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: "Success",
